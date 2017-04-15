@@ -4,6 +4,7 @@
 #include"glutil.h"
 #include"tetris.h"
 #include"game.h"
+#include"globj.h"
 
 using namespace std;
 extern Matrix<float> KeyBindMatrix;
@@ -18,10 +19,6 @@ int main()
 
 	Tetris tetris(15, 30);
 
-	unsigned fv = gl_transfer_data(tetris.vertexes);
-	unsigned fc = gl_transfer_data(tetris.colors);
-	unsigned fe = gl_transfer_index(tetris.indices());
-	
 	Game game{15,30};
 	PGAME = &game;
 
@@ -30,6 +27,12 @@ int main()
 	unsigned shader_program = 
 		make_shader_program("src/tetris.glsl", "src/fragment_shader.glsl");
 	if(!shader_program) return 0;
+
+	GLObject obj{shader_program};
+	obj.vertexes(tetris.vertexes, "a_pos");
+	obj.colors(tetris.colors, "a_color");
+	unsigned fe = obj.indices(tetris.indices());
+	obj.mode(GL_QUADS);
 
 	extern int score;
 	while (!glfwWindowShouldClose(window)) {
@@ -43,10 +46,8 @@ int main()
 		auto tm = m.glscale(0.1,0.064,0.1) * KeyBindMatrix;
 		transfer_matrix(shader_program, tm, "KeyBindMatrix");
 		tetris.board = game.change();
-		gl_transfer_index(tetris.indices(), fe);
-
-		gl_bind_data(fv, fc, fe);
-		glDrawElements(GL_QUADS, tetris.index_size(), GL_UNSIGNED_INT, 0);
+		obj.indices(tetris.indices(), fe);
+		obj();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
