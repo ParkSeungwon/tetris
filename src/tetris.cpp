@@ -14,7 +14,7 @@ int main()
 {
 	if (!glfwInit()) return -1;
 
-	GLFWwindow* window = glfwCreateWindow(640, 1000, "Color Cube", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(640, 1000, "3D Tetris", NULL, NULL);
 	if (!glinit(window)) return -1;
 
 	Tetris tetris(15, 30);
